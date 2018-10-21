@@ -7,41 +7,87 @@
 //    4 = Dishwasher
 
 // Button Digital Input Ports
-const int BUTTON_A_PORT = 0;
-const int BUTTON_B_PORT = 0;
-const int BUTTON_C_PORT = 0;
-const int BUTTON_D_PORT = 0;
+const int[] BUTTON_PORTS = {0 /*A*/, 0 /*B*/, 0 /*C*/, 0 /*D*/};
+
+// LED Digital Output Ports
+const int[] LED_PORTS = {0 /*A*/, 0 /*B*/, 0 /*C*/, 0 /*D*/};
                                
 // Scores of each input-output combination
-                        /*Sprinkler*/     /*Sewer*/     /*Sink*/    /*Hose*/
-const int[] SCORE_0 = {   5,                1,            10,         5};   // Fresh Water
-const int[] SCORE_1 = {   10,               5,            2,          10};  // Laundry
-const int[] SCORE_2 = {   10,               5,            2,          10};  // Shower
-const int[] SCORE_3 = {   1,                10,           0,          1};   // Toilet
+           /* Outputs:    Sprinkler         Sewer         Sink        Hose     Inputs */
+const int[][] SCORE =  {{ 5,                1,            10,         5},   // Fresh Water
+                        { 10,               5,            2,          10},  // Laundry
+                        { 10,               5,            2,          10},  // Shower
+                        { 1,                10,           0,          1}};  // Toilet
 
-// Number of greywater inputs
+// Each button corresponds to one output.
+// The index in the score matrix where this output lies is the button score index
+const int[] BUTTON_SCORE_INDEX = {2 /*Button A- Sink*/ , 1 /*Button B- Sewer*/, 3 /*Button C- Hose*/, 4 /*Button D- Sprinkler*/};
+
+// Keep track of number of inputs and outputs
 const int NUM_INPUTS = 4;
+const int NUM_OUTPUS = 4;
+
+// Number of milliseconds the LED paths should stay lit up for
+const int LED_MS_LIT_UP = 1500;
 
 // Initialize user score
 int userScore;
 
+/**
+ * Setup sets up input/output modes for ports
+ */
 void setup() {
-  
 
+  // Set each button port to be an input
+  for(int port : BUTTON_PORTS) {
+    pinMode(port, INPUT);
+  }
+
+  // Set each LED port to be an output
+  for(int port: LED_PORTS) {
+    pinMode(port, OUTPUT);
+  }
+  
 }
 
+/**
+ * Each loop is one player's game
+ */
 void loop() {
+
+  // Reset user score for each new game
+  userScore = 0;
 
   // Loop through the greywater inputs each time the game runs
   for(int inputCounter = 0; inputCounter < NUM_INPUTS; inputCounter++) {
 
-    // Reset user score
-    userScore = 0;
+    // Initialize button pressed
+    int buttonPressed;
 
-    bool buttonHit = false;
-    while(digitalRead(BUTTON_A_PORT) == LOW && digitalRead(BUTTON_B_PORT) == LOW && digitalRead(BUTTON_C_PORT) == LOW && digitalRead(BUTTON_A_PORT) == LOW) {
+    // Set isButtonHit to false.
+    // isButtonHit keeps track of whether a button has been hit for that 
+    bool isButtonHit = false;
     
+    // Keep checking for button press while one isn't pressed
+    while(!isButtonHit) {
+
+      // For each button, if pressed, register that a button was pressed and which button it was
+      for (int button = 0; button < NUM_OUTPUTS; button++) {
+        if (digitalRead(BUTTON_PORTS[button]) == LOW) {
+          isButtonHit = true;
+          buttonPressed = button;
+        }
+      }
+      
     }
+
+    // Light up correct LED Path for LED_MS_LIT_UP milliseconds
+    digitalWrite(LED_PORTS[buttonPressed], HIGH);
+    delay(LED_MS_LIT_UP);
+    digitalWrite(LED_PORTS[buttonPressed], LOW);
+
+    // Add the score of the input-output combination to 
+    userScore += SCORE[inputCounter][BUTTON_SCORE_INDEX[buttonPressed]];
 
   }
 

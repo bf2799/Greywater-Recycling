@@ -1,3 +1,6 @@
+// Load the LiquidCrystal library. Gives commands to interface to the LCD
+#include <LiquidCrystal.h>
+
 // Greywater Input number look-up
 // Instead of making each input to an object, each input is given a number to make the code loops easier
 //    0 = Fresh Water
@@ -9,7 +12,7 @@
 // Button Digital Input Ports
 const int[] BUTTON_PORTS = {0 /*A*/, 0 /*B*/, 0 /*C*/, 0 /*D*/};
 
-// LED Digital Output Ports
+// LED Analog Output Ports (Digital ports will be used up)
 const int[] LED_PORTS = {0 /*A*/, 0 /*B*/, 0 /*C*/, 0 /*D*/};
                                
 // Scores of each input-output combination
@@ -30,6 +33,12 @@ const int NUM_OUTPUS = 4;
 // Number of milliseconds the LED paths should stay lit up for
 const int LED_MS_LIT_UP = 1500;
 
+// LED brightness 1-255
+const int LED_BRIGHTNESS = 200;
+
+// Initialize Score lcd with digital ports 0, 0, 0, 0, 0, 0
+LiquidCrystal lcdScore(0, 0, 0, 0, 0, 0);
+
 // Initialize user score
 int userScore;
 
@@ -47,6 +56,10 @@ void setup() {
   for(int port: LED_PORTS) {
     pinMode(port, OUTPUT);
   }
+
+  // Initialize 16 x 2 LCD and clear previous information
+  lcdScore.begin(16,2);
+  lcdScore.clear();
   
 }
 
@@ -82,12 +95,20 @@ void loop() {
     }
 
     // Light up correct LED Path for LED_MS_LIT_UP milliseconds
-    digitalWrite(LED_PORTS[buttonPressed], HIGH);
+    analogWrite(LED_PORTS[buttonPressed], LED_BRIGHTNESS);
     delay(LED_MS_LIT_UP);
-    digitalWrite(LED_PORTS[buttonPressed], LOW);
+
+    // Turn off LED Path
+    analogWrite(LED_PORTS[buttonPressed], 0);
 
     // Add the score of the input-output combination to 
     userScore += SCORE[inputCounter][BUTTON_SCORE_INDEX[buttonPressed]];
+
+    // Set LCD cursor to first position on screen (0, 1)
+    lcdScore.setCursor(0, 1);
+
+    // Print the user score to the LCD
+    lcdScore.print(String(userscore));
 
   }
 

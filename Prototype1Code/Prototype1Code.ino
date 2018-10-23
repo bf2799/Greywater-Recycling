@@ -10,21 +10,21 @@
 //    4 = Dishwasher
 
 // Button Digital Input Ports
-const int[] BUTTON_PORTS = {0 /*A*/, 0 /*B*/, 0 /*C*/, 0 /*D*/};
+const int BUTTON_PORTS[] = {0 /*A*/, 0 /*B*/, 0 /*C*/, 0 /*D*/};
 
 // LED Analog Output Ports (Digital ports will be used up)
-const int[] LED_PORTS = {0 /*A*/, 0 /*B*/, 0 /*C*/, 0 /*D*/};
+const int LED_PORTS[] = {0 /*A*/, 0 /*B*/, 0 /*C*/, 0 /*D*/};
                                
 // Scores of each input-output combination
            /* Outputs:    Sprinkler         Sewer         Sink        Hose     Inputs */
-const int[][] SCORE =  {{ 5,                1,            10,         5},   // Fresh Water
+const int SCORE[4][5] ={{ 5,                1,            10,         5},   // Fresh Water
                         { 10,               5,            2,          10},  // Laundry
                         { 10,               5,            2,          10},  // Shower
                         { 1,                10,           0,          1}};  // Toilet
 
 // Each button corresponds to one output.
 // The index in the score matrix where this output lies is the button score index
-const int[] BUTTON_SCORE_INDEX = {2 /*Button A- Sink*/ , 1 /*Button B- Sewer*/, 3 /*Button C- Hose*/, 4 /*Button D- Sprinkler*/};
+const int BUTTON_SCORE_INDEX[] = {2 /*Button A- Sink*/ , 1 /*Button B- Sewer*/, 3 /*Button C- Hose*/, 4 /*Button D- Sprinkler*/};
 
 // Keep track of number of inputs and outputs
 const int NUM_INPUTS = 4;
@@ -36,8 +36,8 @@ const int LED_MS_LIT_UP = 1500;
 // LED brightness 1-255
 const int LED_BRIGHTNESS = 200;
 
-// Initialize Score lcd with digital ports 0, 0, 0, 0, 0, 0
-LiquidCrystal lcdScore(0, 0, 0, 0, 0, 0);
+// Initialize Score lcd with digital ports 7, 6, 4, 3, 2, 1
+LiquidCrystal lcdScore(7, 6, 4, 3, 2, 1);
 
 // Initialize user score
 int userScore;
@@ -47,7 +47,7 @@ int userScore;
  */
 void setup() {
 
-  // Set each button port to be an input
+  /*// Set each button port to be an input
   for(int port : BUTTON_PORTS) {
     pinMode(port, INPUT);
   }
@@ -55,11 +55,16 @@ void setup() {
   // Set each LED port to be an output
   for(int port: LED_PORTS) {
     pinMode(port, OUTPUT);
-  }
+  }*/
 
   // Initialize 16 x 2 LCD and clear previous information
   lcdScore.begin(16,2);
   lcdScore.clear();
+
+  ///////TEMPORARY///////////////
+  lcdScore.setCursor(5, 1);
+  lcdScore.print("SCORE!");
+  //////////////////////////////
   
 }
 
@@ -68,6 +73,7 @@ void setup() {
  */
 void loop() {
 
+  /*
   // Reset user score for each new game
   userScore = 0;
 
@@ -110,6 +116,6 @@ void loop() {
     // Print the user score to the LCD
     lcdScore.print(String(userscore));
 
-  }
+  }*/
 
 }

@@ -47,7 +47,7 @@ int userScore;
  */
 void setup() {
 
-  /*// Set each button port to be an input
+  // Set each button port to be an input
   for(int port : BUTTON_PORTS) {
     pinMode(port, INPUT);
   }
@@ -55,16 +55,11 @@ void setup() {
   // Set each LED port to be an output
   for(int port: LED_PORTS) {
     pinMode(port, OUTPUT);
-  }*/
+  }
 
   // Initialize 16 x 2 LCD and clear previous information
   lcdScore.begin(16,2);
   lcdScore.clear();
-
-  ///////TEMPORARY///////////////
-  lcdScore.setCursor(5, 1);
-  lcdScore.print("SCORE!");
-  //////////////////////////////
   
 }
 
@@ -73,7 +68,6 @@ void setup() {
  */
 void loop() {
 
-  /*
   // Reset user score for each new game
   userScore = 0;
 
@@ -116,6 +110,6 @@ void loop() {
     // Print the user score to the LCD
     lcdScore.print(String(userscore));
 
-  }*/
+  }
 
 }

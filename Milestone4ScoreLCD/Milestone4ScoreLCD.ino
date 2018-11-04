@@ -24,9 +24,9 @@ const int NUM_OUTPUTS = 4;
 // Scores of each input-output combination
                             /* Outputs:     Sprinkler         Sewer         Sink        Hose     Inputs */
 const int SCORE[NUM_INPUTS][NUM_OUTPUTS] ={{5,                1,            10,         5},   // Fresh Water
-                                          { 10,               5,            2,          10},  // Laundry
-                                          { 10,               5,            2,          10},  // Shower
-                                          { 1,                10,           0,          1}};  // Toilet
+                                          { 10,               5,            1,          10},  // Laundry
+                                          { 10,               5,            1,          10},  // Shower
+                                          { 1,                10,           1,          1}};  // Toilet
 
 // Each button corresponds to one output.
 // The index in the score matrix where this output lies is the button score index
@@ -102,7 +102,11 @@ void loop() {
     lcdScore.setCursor(0, 0);
 
     // Print the user score to the LCD
-    lcdScore.print("Score: " + String(userScore));
+    lcdScore.print("Score: " + String(SCORE[inputCounter][BUTTON_SCORE_INDEX[buttonPressed]]));
+
+    lcdScore.setCursor(0, 1);
+
+    lcdScore.print("Total: " + String(userScore));
 
   }
 

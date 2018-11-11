@@ -139,11 +139,91 @@ void loop() {
       
     }
 
-
+    // Turn off LED on top
     ledStrip[TOP_LEDS_INDEX][NUM_LEDS[TOP_LEDS_INDEX]] = NO_COLOR;
-    /************************
-    TODO: Light up correct LED Path
-    ************************/
+
+    /***************************************************************
+     * FIRST FLOW OF LEDS (needed to get within index bounds of loop
+     ***************************************************************/
+     
+    ledStrip[buttonPressed][0] = WATER_COLOR_LOW;
+    FastLED.show();
+    delay(FLOW_DELAY_MS);
+  
+    ledStrip[buttonPressed][1] = WATER_COLOR_LOW;
+    ledStrip[buttonPressed][0] = WATER_COLOR_MED;
+    FastLED.show();
+    delay(FLOW_DELAY_MS);
+  
+    ledStrip[buttonPressed][2] = WATER_COLOR_LOW;
+    ledStrip[buttonPressed][1] = WATER_COLOR_MED;
+    ledStrip[buttonPressed][0] = WATER_COLOR_HIGH;
+    FastLED.show();
+    delay(FLOW_DELAY_MS);
+  
+    ledStrip[buttonPressed][3] = WATER_COLOR_LOW;
+    ledStrip[buttonPressed][2] = WATER_COLOR_MED;
+    ledStrip[buttonPressed][1] = WATER_COLOR_HIGH;
+    ledStrip[buttonPressed][0] = WATER_COLOR_MED;
+    FastLED.show();
+    delay(FLOW_DELAY_MS);
+  
+    ledStrip[buttonPressed][4] = WATER_COLOR_LOW;
+    ledStrip[buttonPressed][3] = WATER_COLOR_MED;
+    ledStrip[buttonPressed][2] = WATER_COLOR_HIGH;
+    ledStrip[buttonPressed][1] = WATER_COLOR_MED;
+    ledStrip[buttonPressed][0] = WATER_COLOR_LOW;
+    FastLED.show();
+    delay(FLOW_DELAY_MS);
+
+    /******************************************
+     * MAIN FLOW PATTERN OF 5 LIGHTS AT A TIME
+     ******************************************/
+    for (int i = 3; i < NUM_LEDS[buttonPressed] - 2; i++) {
+      ledStrip[buttonPressed][i] = WATER_COLOR_HIGH;
+      ledStrip[buttonPressed][i - 1] = WATER_COLOR_MED;
+      ledStrip[buttonPressed][i + 1] = WATER_COLOR_MED;
+      ledStrip[buttonPressed][i - 2] = WATER_COLOR_LOW;
+      ledStrip[buttonPressed][i + 2] = WATER_COLOR_LOW;
+      ledStrip[buttonPressed][i - 3] = DEFAULT_COLORS[buttonPressed];
+      FastLED.show();
+      delay(FLOW_DELAY_MS);
+    }
+
+    /******************************************
+     * FLOW AT END OF LEDS
+     ******************************************/
+    ledStrip[buttonPressed][NUM_LEDS[buttonPressed] - 1] = WATER_COLOR_MED;
+    ledStrip[buttonPressed][NUM_LEDS[buttonPressed] - 2] = WATER_COLOR_HIGH;
+    ledStrip[buttonPressed][NUM_LEDS[buttonPressed] - 3] = WATER_COLOR_MED;
+    ledStrip[buttonPressed][NUM_LEDS[buttonPressed] - 4] = WATER_COLOR_LOW;
+    ledStrip[buttonPressed][NUM_LEDS[buttonPressed] - 5] = DEFAULT_COLORS[buttonPressed];
+    FastLED.show();
+    delay(FLOW_DELAY_MS);
+  
+    ledStrip[buttonPressed][NUM_LEDS[buttonPressed] - 1] = WATER_COLOR_HIGH;
+    ledStrip[buttonPressed][NUM_LEDS[buttonPressed] - 2] = WATER_COLOR_MED;
+    ledStrip[buttonPressed][NUM_LEDS[buttonPressed] - 3] = WATER_COLOR_LOW;
+    ledStrip[buttonPressed][NUM_LEDS[buttonPressed] - 4] = DEFAULT_COLORS[buttonPressed];
+    FastLED.show();
+    delay(FLOW_DELAY_MS);
+  
+    ledStrip[buttonPressed][NUM_LEDS[buttonPressed] - 1] = WATER_COLOR_MED;
+    ledStrip[buttonPressed][NUM_LEDS[buttonPressed] - 2] = WATER_COLOR_LOW;
+    ledStrip[buttonPressed][NUM_LEDS[buttonPressed] - 3] = DEFAULT_COLORS[buttonPressed];
+    FastLED.show();
+    delay(FLOW_DELAY_MS);
+  
+    ledStrip[buttonPressed][NUM_LEDS[buttonPressed] - 1] = WATER_COLOR_LOW;
+    ledStrip[buttonPressed][NUM_LEDS[buttonPressed] - 2] = DEFAULT_COLORS[buttonPressed];
+    FastLED.show();
+    delay(FLOW_DELAY_MS);
+  
+    ledStrip[buttonPressed][NUM_LEDS[buttonPressed] - 1] = DEFAULT_COLORS[buttonPressed];
+    FastLED.show();
+    delay(FLOW_DELAY_MS); 
+
+    /******END OF LED SECTION******/
 
     // Add the score of the input-output combination to user score
     userScore += SCORE[inputCounter][BUTTON_SCORE_INDEX[buttonPressed]];

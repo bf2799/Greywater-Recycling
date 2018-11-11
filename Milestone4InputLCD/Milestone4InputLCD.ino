@@ -36,8 +36,6 @@ void setup() {
     pinMode(port, INPUT);
   }
 
-  Serial.begin(9600);
-
   // Set the backlight on the LCD
   analogWrite(LCD_BACKLIGHT_PORT, LCD_BACKLIGHT_VALUE);
 
@@ -80,7 +78,6 @@ void loop() {
       // For each button, if pressed, increase the number of buttons that were pressed
       for (int button = 0; button < NUM_OUTPUTS; button++) {
         if (digitalRead(BUTTON_PORTS[button]) == LOW) {
-          Serial.print(button);
           numButtonsHit++;
         }
       }

@@ -1,4 +1,4 @@
-// Load the LiquidCrystal library. Gives commands to interface to the LCD
+  // Load the LiquidCrystal library. Gives commands to interface to the LCD
 #include <LiquidCrystal.h>
 
 // Greywater Input number look-up
@@ -9,13 +9,13 @@
 //    3 = Toilet
 
 // Button Digital Input Ports
-const int BUTTON_PORTS[] = {13 /*A*/, 12 /*B*/, 11 /*C*/, 10 /*D*/};
+const int BUTTON_PORTS[] = {A3 /*A*/, A4 /*B*/, A5 /*C*/, A2 /*D*/};
 
 // LCD Ports
-const int LCD_PORTS[] = {7, 6, 5, 4, 3, 2};
+const int LCD_PORTS[] = {8, 9, 10, 11, 12, 13};
 
 // Port of the LCD Backlight
-const int LCD_BACKLIGHT_PORT = 9;
+const int LCD_BACKLIGHT_PORT = 6;
 
 // Keep track of number of inputs and outputs
 const int NUM_INPUTS = 4;
@@ -31,17 +31,14 @@ LiquidCrystal lcdInput(LCD_PORTS[0], LCD_PORTS[1], LCD_PORTS[2], LCD_PORTS[3], L
 
 void setup() {
 
-  // Set each button port to be an input
-  for(int port : BUTTON_PORTS) {
-    pinMode(port, INPUT);
-  }
-
   // Set the backlight on the LCD
   analogWrite(LCD_BACKLIGHT_PORT, LCD_BACKLIGHT_VALUE);
 
   // Initialize 16 x 2 LCD and clear previous information
   lcdInput.begin(16,2);
   lcdInput.clear();
+
+  Serial.begin(9600);
 
 }
 
@@ -58,6 +55,8 @@ void loop() {
 
     // Print the current greywater input
     lcdInput.print(GREYWATER_INPUTS[inputCounter]);
+
+    Serial.println("Here");
 
     // Delay one second to prevent button press from registering twice in a row
     delay(1000);

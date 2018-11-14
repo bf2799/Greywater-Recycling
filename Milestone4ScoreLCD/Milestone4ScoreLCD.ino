@@ -12,19 +12,19 @@
 //    3 = Toilet
 
 // Button Digital Input Ports
-const int BUTTON_PORTS[] = {A5 /*A*/, A4 /*B*/, A3 /*C*/, A2 /*D*/};
+const int BUTTON_PORTS[] = {A4 /*A*/, A0 /*B*/, A5 /*C*/, A2 /*D*/};
 
 // LCD Ports
-const int LCD_PORTS[] = {7, 6, 5, 4, 3, 2};
+const int LCD_PORTS[] = {8, 9, 10, 11, 12, 13};
 
 // Port of the LCD Backlight
-const int LCD_BACKLIGHT_PORT = 9;
+const int LCD_BACKLIGHT_PORT = 6;
 
 // Ports of the LED Strips
-const int LED_STRIP_A_PORT = 13;
-const int LED_STRIP_B_PORT = 12;
-const int LED_STRIP_C_PORT = 11;
-const int LED_STRIP_D_PORT = 10;
+const int LED_STRIP_A_PORT = 0;
+const int LED_STRIP_B_PORT = 0;
+const int LED_STRIP_C_PORT = 0;
+const int LED_STRIP_D_PORT = 0;
 
 // LED_STRIP_PORTS index for top LEDs
 const int TOP_LEDS_INDEX = 2;
@@ -242,9 +242,6 @@ void loop() {
 
     // Print the total score
     lcdScore.print("Total: " + String(userScore));
-
-    // Delay one second to prevent button press from registering twice in a row
-    delay(1000);
 
   }
 

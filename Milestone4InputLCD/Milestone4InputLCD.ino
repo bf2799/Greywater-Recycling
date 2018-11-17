@@ -38,8 +38,6 @@ void setup() {
   lcdInput.begin(16,2);
   lcdInput.clear();
 
-  Serial.begin(9600);
-
 }
 
 void loop() {
@@ -55,8 +53,6 @@ void loop() {
 
     // Print the current greywater input
     lcdInput.print(GREYWATER_INPUTS[inputCounter]);
-
-    Serial.println("Here");
 
     // Delay one second to prevent button press from registering twice in a row
     delay(1000);

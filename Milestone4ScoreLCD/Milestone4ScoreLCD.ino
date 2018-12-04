@@ -11,61 +11,54 @@
 //    2 = Shower
 //    3 = Toilet
 //    4 = Dishwasher
-//    5 = Bathroom Sink
-//    6 = Kitchen Sink
-//    7 = Gutter
+//    5 = Kitchen Sink
 
 // Button Digital Input Ports
-const int BUTTON_PORTS[] = {A2 /*A*/, A3 /*B*/, A4 /*C*/, A5 /*D*/};
+const int BUTTON_PORTS[] = {A0 /*A*/, A2 /*B*/, A1 /*C*/, A3 /*D*/};
 
 // LCD Ports
-const int LCD_PORTS[] = {8, 9, 10, 11, 12, 13};
-
-// Port of the LCD Backlight
-const int LCD_BACKLIGHT_PORT = 6;
+const int LCD_PORTS[] = {22, 24, 26, 28, 30, 32};
 
 // Ports of the LED Strips
-const int LED_STRIP_A_PORT = 53;
-const int LED_STRIP_B_PORT = 52;
-const int LED_STRIP_C_PORT = 0;
-const int LED_STRIP_D_PORT = 50;
-
-// LED_STRIP_PORTS index for top LEDs
-const int TOP_LEDS_INDEX = 2;
+const int LED_STRIP_A_PORT = 51;
+const int LED_STRIP_B_PORT = 50;
+const int LED_STRIP_C_PORT = 53;
+const int LED_STRIP_D_PORT = 52;
 
 // Keep track of number of inputs and outputs
-const int NUM_INPUTS = 8;
+const int NUM_INPUTS = 6;
 const int NUM_OUTPUTS = 4;
 
 // Scores of each input-output combination
-                            /* Outputs:     Sprinkler         Sewer         Sink        Hose     Inputs */
-const int SCORE[NUM_INPUTS][NUM_OUTPUTS] ={{5,                0,            10,         5 },  // Fresh Water
-                                          { 10,               5,            1,          10},  // Laundry
-                                          { 10,               5,            1,          10},  // Shower
-                                          { 0,                10,           0,          0 },  // Toilet
-                                          { 10,               5,            1,          10},  // Dishwasher
-                                          { 10,               5,            1,          10},  // Bathroom Sink
-                                          { 3,                7,            0,          3 },  // Kitchen Sink
-                                          { 10,               3,            0,          10}}; // Gutter
+                            /* Outputs:     Hose              Sink          Toilet Bowl Sewer    Inputs */
+const int SCORE[NUM_INPUTS][NUM_OUTPUTS] ={{5,                10,           5,          0 },  // Fresh Water
+                                          { 10,               1,            10,         5},   // Laundry
+                                          { 10,               1,            10,         5},   // Shower
+                                          { 0,                0,            0,          10},  // Toilet
+                                          { 10,               1,            10,         5},   // Dishwasher
+                                          { 3,                1,            3,          7}};  // Kitchen Sink          
 
 // Each button corresponds to one output.
 // The index in the score matrix where this output lies is the button score index
-const int BUTTON_SCORE_INDEX[] = {2 /*Button A- Sink*/ , 1 /*Button B- Sewer*/, 3 /*Button C- Hose*/, 0 /*Button D- Sprinkler*/};
-
-// Ananlog value for LCD Backlight
-const int LCD_BACKLIGHT_VALUE = 100;
+const int BUTTON_SCORE_INDEX[] = {1 /*Button A- Sink*/ , 3 /*Button B- Sewer*/, 0 /*Button C- Hose*/, 2 /*Button D- Toilet Bowl*/};
 
 // The number of LEDs in each LED Strip
-const int NUM_LEDS[] = {29 /*Button A- Sink*/, 29 /*Button B- Sewer*/, 0 /*Button C- Hose*/, 29 /*Button D- Sprinkler*/};
-
-// The number of LEDs on the TOP_LED_PORT above the normal number of LEDs
-const int NUM_TOP_LEDS = 0;
+const int NUM_LEDS[] = {23 /*Button A- Sink*/, 27 /*Button B- Sewer*/, 24 /*Button C- Hose*/, 22 /*Button D- Toilet Bowl*/};
 
 // Time to delay between changes in flow pattern
 const int FLOW_DELAY_MS = 50;
 
 // Time to delay to look at computer screen
 const int SCREEN_DELAY_SEC = 5;
+
+// Time the start button needs to be held in order to trigger the game starting
+const int START_BUTTON_HOLD_TIME_MS = 1000;
+
+// Time to hold buttons A and B to reset the game
+const int RESET_HOLD_TIME_MS = 2000;
+
+// Time it takes LEDs to flash 3 times
+const int LED_FLASH_TIME_MS = 1500;
 
 // Preset color options for LED strips
 const CRGB WATER_COLOR_LOW(0, 240, 200);
@@ -85,7 +78,6 @@ int highScore = 0;
 void setup() {
 
   // Set the backlight on the LCD
-  analogWrite(LCD_BACKLIGHT_PORT, LCD_BACKLIGHT_VALUE);
 
   // Initialize 16 x 2 LCD and clear previous information
   lcdScore.begin(16,2);
@@ -94,17 +86,50 @@ void setup() {
   // Make each LED strip have access to FastLED library
   FastLED.addLeds<WS2812, LED_STRIP_A_PORT, GRB>(ledStrip[0], NUM_LEDS[0]);
   FastLED.addLeds<WS2812, LED_STRIP_B_PORT, GRB>(ledStrip[1], NUM_LEDS[1]);
-  //FastLED.addLeds<WS2812, LED_STRIP_C_PORT, GRB>(ledStrip[2], NUM_LEDS[2] + NUM_TOP_LEDS);
+  FastLED.addLeds<WS2812, LED_STRIP_C_PORT, GRB>(ledStrip[2], NUM_LEDS[2]);
   FastLED.addLeds<WS2812, LED_STRIP_D_PORT, GRB>(ledStrip[3], NUM_LEDS[3]);
+
+  Serial.begin(9600);
 }
 
 // Initialize user score
 int userScore;
 
 void loop() {
+
+  // Initialize whether the game has started as false
+  bool isStarted = false;
+
+  // Keep running code while button A hasn't been held to start the game
+  while(!isStarted) {
+
+    bool isPressed = false;
+    // Wait while button A isn't pressed
+    while(!isPressed) {
+      if (digitalRead(BUTTON_PORTS[0]) == LOW) {
+        isPressed = true;
+      }
+    }
+
+    // Wait for time button should be held down to start
+    delay(START_BUTTON_HOLD_TIME_MS);
+
+    // If button A is still pressed after delay
+    //    Set that the game has started to true to exit loop
+    if (digitalRead(BUTTON_PORTS[0]) == LOW) {
+      isStarted = true;
+    }
+    
+  }
+
+  // Clear LCD screen
+  lcdScore.clear();
   
   // Reset user score for each new game
   userScore = 0;
+
+  // Pause to give user time to release button
+  delay(2 * START_BUTTON_HOLD_TIME_MS);
 
   // Loop through the greywater inputs each time the game runs
   for(int inputCounter = 0; inputCounter < NUM_INPUTS; inputCounter++) {
@@ -116,14 +141,6 @@ void loop() {
       }
     }
     FastLED.show();
-
-    // Flow the LEDs from the LCD screen to the letter labels
-    for (int led = NUM_TOP_LEDS + NUM_LEDS[TOP_LEDS_INDEX] - 2; led >= NUM_LEDS[TOP_LEDS_INDEX]; led--) {
-      ledStrip[TOP_LEDS_INDEX][led] = WATER_COLOR_HIGH;
-      ledStrip[TOP_LEDS_INDEX][led + 1] = NO_COLOR;
-      FastLED.show();
-      delay(FLOW_DELAY_MS);
-    }
 
     // Initialize button pressed
     int buttonPressed;
@@ -142,11 +159,28 @@ void loop() {
           buttonPressed = button;
         }
       }
-      
+   
     }
 
-    // Turn off LED on top
-    ledStrip[TOP_LEDS_INDEX][NUM_LEDS[TOP_LEDS_INDEX]] = NO_COLOR;
+    Serial.println(buttonPressed);
+
+    // Delay 50 ms to allow user time to press both A and B buttons
+    delay(50);
+
+    // Get the current time
+    long curTime = millis();
+
+    // Wait while buttons A and B are still pressed and reset time hasn't been passed
+    while (digitalRead(BUTTON_PORTS[0]) == LOW && digitalRead(BUTTON_PORTS[1]) == LOW
+            && millis() - curTime <= RESET_HOLD_TIME_MS) {
+        // Do Nothing. Wait
+    }
+
+    // If more than the reset time has passed
+    //  Exit out of the input loop to end the game
+    if (millis() - curTime > RESET_HOLD_TIME_MS) {
+      break;
+    }
 
     /***************************************************************
      * FIRST FLOW OF LEDS (needed to get within index bounds of loop
@@ -253,6 +287,33 @@ void loop() {
     // Delay for time to look at Matlab screen
     delay(SCREEN_DELAY_SEC * 1000);
 
+    // Repeat blink 3 times
+    for (int i = 0; i < 3; i++) {
+
+      // Turn all LED strips off
+      for (int output = 0; output < NUM_OUTPUTS; output++) {
+        for (int led = 0; led < NUM_LEDS[output]; led++) {
+          ledStrip[output][led] = NO_COLOR;
+        }
+      }
+      FastLED.show();
+
+      // Delay enough time for 3 flashes to happen
+      delay(LED_FLASH_TIME_MS / 6);
+      
+      // Turn all LED strips to their default color
+      for (int output = 0; output < NUM_OUTPUTS; output++) {
+        for (int led = 0; led < NUM_LEDS[output]; led++) {
+          ledStrip[output][led] = DEFAULT_COLORS[output];
+        }
+      }
+      FastLED.show();
+
+      // Delay enough time for 3 flashes to happen
+      delay(LED_FLASH_TIME_MS / 6);
+
+    }
+
   }
 
   if (userScore > highScore) {
@@ -269,14 +330,9 @@ void loop() {
   lcdScore.print("Final Score: " + String(userScore));
 
   // Set LCD cursor to beginning of second line
-  ldcScore.setCursor(0, 1);
+  lcdScore.setCursor(0, 1);
 
   // Print the high score to the LCD
   lcdScore.print("High Score: " + String(highScore));
-
-  // Wait while button A isn't pressed
-  while(digitalRead(BUTTON_PORTS[0] == HIGH) {
-    // Do nothing
-  }
     
 }
